@@ -83,8 +83,6 @@ webModeler:
       fsGroup: null
     containerSecurityContext:
       runAsUser: null
-identityKeycloak:
-  enabled: false
 # omit the values below if identity.enabled is false
 connectors:
   enabled: false
@@ -95,13 +93,13 @@ connectors:
 
 # omit the values below if identity.enabled is false
 identity:
-  enabled: false
   podSecurityContext:
     fsGroup: null
   containerSecurityContext:
     runAsUser: null
   # omit the values below if identity.keycloak.enabled is false
   keycloak:
+    enabled: false
     podSecurityContext:
       fsGroup: null
     containerSecurityContext:
