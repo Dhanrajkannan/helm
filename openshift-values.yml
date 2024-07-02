@@ -83,7 +83,8 @@ webModeler:
       fsGroup: null
     containerSecurityContext:
       runAsUser: null
-
+identityKeycloak:
+  enabled: false
 # omit the values below if identity.enabled is false
 connectors:
   enabled: false
