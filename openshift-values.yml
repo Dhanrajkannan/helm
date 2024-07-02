@@ -40,7 +40,6 @@ zeebeGateway:
 
 # omit the values below if operate.enabled is false
 operate:
-  enabled: false
   configMap:
     defaultMode: 0444
   podSecurityContext:
@@ -50,17 +49,12 @@ operate:
 
 # omit the values below if optimize.enabled is false
 optimize:
-  enabled: false
   podSecurityContext:
     fsGroup: null
   containerSecurityContext:
     runAsUser: null
-
-identityKeycloak:
-  enabled: false
 # omit the values below if tasklist.enabled is false
 tasklist:
-  enabled: false
   configMap:
     defaultMode: 0444
   podSecurityContext:
@@ -70,7 +64,6 @@ tasklist:
 
 # omit the values below if webModeler.enabled is false
 webModeler:
-  enabled: false
   restapi:
     podSecurityContext:
       fsGroup: null
@@ -89,7 +82,6 @@ webModeler:
 
 # omit the values below if identity.enabled is false
 connectors:
-  enabled: false
   podSecurityContext:
     fsGroup: null
   containerSecurityContext:
@@ -97,7 +89,6 @@ connectors:
 
 # omit the values below if identity.enabled is false
 identity:
-  enabled: false
   podSecurityContext:
     fsGroup: null
   containerSecurityContext:
@@ -131,7 +122,6 @@ identity:
 
 # omit the values below if elasticsearch.enabled is false
 elasticsearch:
-  enabled: false
   master:
     podSecurityContext:
       fsGroup: null
