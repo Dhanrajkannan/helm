@@ -143,8 +143,9 @@ elasticsearch:
       runAsUser: null
   volumeClaimTemplate:
     accessModes: [ "ReadWriteOnce" ]
-    storageClassName: "standard"
     resources:
+      limits: 
+        storage: 10Gi
       requests:
         storage: 5Gi
   # If needed, OpenShift TuneD operator will be used to set sysctl vm.max_map_count.
