@@ -99,7 +99,6 @@ identity:
     runAsUser: null
   # omit the values below if identity.keycloak.enabled is false
   keycloak:
-    enabled: false
     podSecurityContext:
       fsGroup: null
     containerSecurityContext:
@@ -127,7 +126,7 @@ identity:
 
 # omit the values below if elasticsearch.enabled is false
 elasticsearch:
-  enabled: false
+  enabled: true
   master:
     podSecurityContext:
       fsGroup: null
