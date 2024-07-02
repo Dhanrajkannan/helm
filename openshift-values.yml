@@ -9,6 +9,12 @@
 ##
 ---
 # omit the values below if zeebe.enabled is false
+global:
+  identity:
+    auth:
+      # Disable Identity authentication for local development
+      # it will fall back to basic-auth: demo/demo as default user
+      enabled: false
 zeebe:
   replicationFactor: '1'
   configMap:
@@ -126,12 +132,21 @@ identity:
 
 # omit the values below if elasticsearch.enabled is false
 elasticsearch:
+  replicas: 1
   enabled: true
+  minimumMasterNodes: 1
+  clusterHealthCheckParams: "wait_for_status=yellow&timeout=1s"
   master:
     podSecurityContext:
       fsGroup: null
     containerSecurityContext:
       runAsUser: null
+  volumeClaimTemplate:
+    accessModes: [ "ReadWriteOnce" ]
+    storageClassName: "standard"
+    resources:
+      requests:
+        storage: 5Gi
   # If needed, OpenShift TuneD operator will be used to set sysctl vm.max_map_count.
   # Apply the manifest "openshift-tuned.yaml" before install Camunda 8 chart.
   sysctlImage:
