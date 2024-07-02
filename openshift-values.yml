@@ -56,6 +56,8 @@ optimize:
   containerSecurityContext:
     runAsUser: null
 
+identityKeycloak:
+  enabled: false
 # omit the values below if tasklist.enabled is false
 tasklist:
   enabled: false
