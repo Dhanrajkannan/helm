@@ -23,10 +23,10 @@ zeebe:
   pvcSize: 3Gi
   resources:
     limits:
-      cpu: 2500m
+      cpu: 1
       memory: 500Mi
     requests:
-      cpu: 2500m
+      cpu: 1
       memory: 500Mi
 # omit the values below if zeebe-gateway.enabled is false
 zeebeGateway:
