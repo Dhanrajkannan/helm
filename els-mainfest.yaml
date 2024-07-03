@@ -217,7 +217,7 @@ spec:
             - name: ELASTICSEARCH_CLUSTER_NAME
               value: "elastic"
             - name: ELASTICSEARCH_CLUSTER_HOSTS
-              value: "camunda-elasticsearch-master-hl.default.svc.cluster.local,"
+              value: "camunda-elasticsearch-master-hl.dhanrajcse-dev.svc.cluster.local,"
             - name: ELASTICSEARCH_TOTAL_NODES
               value: "1"
             - name: ELASTICSEARCH_CLUSTER_MASTER_HOSTS
@@ -225,7 +225,7 @@ spec:
             - name: ELASTICSEARCH_MINIMUM_MASTER_NODES
               value: "1"
             - name: ELASTICSEARCH_ADVERTISED_HOSTNAME
-              value: "$(MY_POD_NAME).camunda-elasticsearch-master-hl.default.svc.cluster.local"
+              value: "$(MY_POD_NAME).camunda-elasticsearch-master-hl.dhanrajcse-dev.svc.cluster.local"
             - name: ELASTICSEARCH_HEAP_SIZE
               value: "500m"
             - name: ELASTICSEARCH_ENABLE_REST_TLS
