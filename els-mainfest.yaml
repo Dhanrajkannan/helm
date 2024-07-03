@@ -1,1 +1,310 @@
-
+---
+# Source: camunda-platform/charts/elasticsearch/templates/master/networkpolicy.yaml
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: camunda-elasticsearch-master
+  namespace: "default"
+  labels:
+    app.kubernetes.io/instance: camunda
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: elasticsearch
+    app.kubernetes.io/version: 8.12.2
+    helm.sh/chart: elasticsearch-19.19.4
+    app.kubernetes.io/component: master
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/instance: camunda
+      app.kubernetes.io/name: elasticsearch
+      app.kubernetes.io/component: master
+  policyTypes:
+    - Ingress
+    - Egress
+  egress:
+    - {}
+  ingress:
+    - ports:
+        - port: 9200
+        - port: 9300
+---
+# Source: camunda-platform/charts/elasticsearch/templates/master/serviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: camunda-elasticsearch-master
+  namespace: "default"
+  labels:
+    app.kubernetes.io/instance: camunda
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: elasticsearch
+    app.kubernetes.io/version: 8.12.2
+    helm.sh/chart: elasticsearch-19.19.4
+    app.kubernetes.io/component: master
+automountServiceAccountToken: false
+---
+# Source: camunda-platform/templates/zeebe/serviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: camunda-zeebe
+  labels:
+    app: camunda-platform
+    app.kubernetes.io/name: camunda-platform
+    app.kubernetes.io/instance: camunda
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/part-of: camunda-platform
+    helm.sh/chart: camunda-platform-9.3.7
+    app.kubernetes.io/version: "8.4.9"
+    app.kubernetes.io/component: zeebe-broker
+automountServiceAccountToken: false
+---
+# Source: camunda-platform/templates/camunda/configmap-release.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: camunda-camunda-platform-release
+  labels:
+    app: camunda-platform
+    app.kubernetes.io/name: camunda-platform
+    app.kubernetes.io/instance: camunda
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/part-of: camunda-platform
+    helm.sh/chart: camunda-platform-9.3.7
+  annotations:
+    {}
+data:
+  info: |-
+    - name: camunda
+      namespace: default
+      version: 9.3.7
+      components:
+---
+# Source: camunda-platform/charts/elasticsearch/templates/master/svc-headless.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: camunda-elasticsearch-master-hl
+  namespace: "default"
+  labels:
+    app.kubernetes.io/instance: camunda
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: elasticsearch
+    app.kubernetes.io/version: 8.12.2
+    helm.sh/chart: elasticsearch-19.19.4
+    app.kubernetes.io/component: master
+spec:
+  type: ClusterIP
+  clusterIP: None
+  publishNotReadyAddresses: true
+  ports:
+    - name: tcp-rest-api
+      port: 9200
+      targetPort: rest-api
+    - name: tcp-transport
+      port: 9300
+      targetPort: transport
+  selector:
+    app.kubernetes.io/instance: camunda
+    app.kubernetes.io/name: elasticsearch
+    app.kubernetes.io/component: master
+---
+# Source: camunda-platform/charts/elasticsearch/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: camunda-elasticsearch
+  namespace: "default"
+  labels:
+    app.kubernetes.io/instance: camunda
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: elasticsearch
+    app.kubernetes.io/version: 8.12.2
+    helm.sh/chart: elasticsearch-19.19.4
+    app.kubernetes.io/component: master
+spec:
+  type: ClusterIP
+  sessionAffinity: None
+  ports:
+    - name: tcp-rest-api
+      port: 9200
+      targetPort: rest-api
+      nodePort: null
+    - name: tcp-transport
+      port: 9300
+      nodePort: null
+  selector:
+    app.kubernetes.io/instance: camunda
+    app.kubernetes.io/name: elasticsearch
+    app.kubernetes.io/component: master
+---
+# Source: camunda-platform/charts/elasticsearch/templates/master/statefulset.yaml
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: camunda-elasticsearch-master
+  namespace: "default"
+  labels:
+    app.kubernetes.io/instance: camunda
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: elasticsearch
+    app.kubernetes.io/version: 8.12.2
+    helm.sh/chart: elasticsearch-19.19.4
+    app.kubernetes.io/component: master
+    ## Istio Labels: https://istio.io/docs/ops/deployment/requirements/
+    app: master
+spec:
+  replicas: 1
+  podManagementPolicy: Parallel
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: camunda
+      app.kubernetes.io/name: elasticsearch
+      app.kubernetes.io/component: master
+  serviceName: camunda-elasticsearch-master-hl
+  updateStrategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/instance: camunda
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: elasticsearch
+        app.kubernetes.io/version: 8.12.2
+        helm.sh/chart: elasticsearch-19.19.4
+        app.kubernetes.io/component: master
+        ## Istio Labels: https://istio.io/docs/ops/deployment/requirements/
+        app: master
+      annotations:
+    spec:
+      serviceAccountName: camunda-elasticsearch-master
+      
+      automountServiceAccountToken: false
+      affinity:
+        podAffinity:
+          
+        podAntiAffinity:
+          
+        nodeAffinity:
+          
+      securityContext:
+        fsGroupChangePolicy: Always
+        supplementalGroups: []
+        sysctls: []
+      containers:
+        - name: elasticsearch
+          image: docker.io/bitnami/elasticsearch:8.9.2
+          imagePullPolicy: "IfNotPresent"
+          securityContext:
+            runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
+          env:
+            - name: BITNAMI_DEBUG
+              value: "false"
+            - name: MY_POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: ELASTICSEARCH_IS_DEDICATED_NODE
+              value: "no"
+            - name: ELASTICSEARCH_NODE_ROLES
+              value: "master"
+            - name: ELASTICSEARCH_TRANSPORT_PORT_NUMBER
+              value: "9300"
+            - name: ELASTICSEARCH_HTTP_PORT_NUMBER
+              value: "9200"
+            - name: ELASTICSEARCH_CLUSTER_NAME
+              value: "elastic"
+            - name: ELASTICSEARCH_CLUSTER_HOSTS
+              value: "camunda-elasticsearch-master-hl.default.svc.cluster.local,"
+            - name: ELASTICSEARCH_TOTAL_NODES
+              value: "1"
+            - name: ELASTICSEARCH_CLUSTER_MASTER_HOSTS
+              value: camunda-elasticsearch-master-0 
+            - name: ELASTICSEARCH_MINIMUM_MASTER_NODES
+              value: "1"
+            - name: ELASTICSEARCH_ADVERTISED_HOSTNAME
+              value: "$(MY_POD_NAME).camunda-elasticsearch-master-hl.default.svc.cluster.local"
+            - name: ELASTICSEARCH_HEAP_SIZE
+              value: "500m"
+            - name: ELASTICSEARCH_ENABLE_REST_TLS
+              value: "false"
+          ports:
+            - name: rest-api
+              containerPort: 9200
+            - name: transport
+              containerPort: 9300
+          livenessProbe:
+            failureThreshold: 5
+            initialDelaySeconds: 180
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5
+            tcpSocket:
+              port: rest-api
+          readinessProbe:
+            failureThreshold: 5
+            initialDelaySeconds: 90
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5
+            exec:
+              command:
+                - /opt/bitnami/scripts/elasticsearch/healthcheck.sh
+          resources:
+            limits:
+              cpu: 1
+              memory: 1Gi
+            requests:
+              cpu: 1
+              memory: 1Gi
+          volumeMounts:
+            - name: data
+              mountPath: /bitnami/elasticsearch/data
+            - mountPath: /tmp
+              name: tmp
+            - mountPath: /usr/share/elasticsearch/logs
+              name: logs
+            - mountPath: /usr/share/elasticsearch/config
+              name: config-dir
+      volumes:
+        - emptyDir: {}
+          name: tmp
+        - emptyDir: {}
+          name: logs
+        - emptyDir: {}
+          name: config-dir
+  volumeClaimTemplates:
+    - metadata:
+        name: "data"
+      spec:
+        accessModes:
+          - "ReadWriteOnce"
+        resources:
+          requests:
+            storage: "10Gi"
+---
+# Source: camunda-platform/templates/operate/tests/test-connection.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "camunda-operate-test-connection"
+  labels:
+    app: camunda-platform
+    app.kubernetes.io/name: camunda-platform
+    app.kubernetes.io/instance: camunda
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/part-of: camunda-platform
+    helm.sh/chart: camunda-platform-9.3.7
+    app.kubernetes.io/version: "8.4.10"
+    app.kubernetes.io/component: operate
+  annotations:
+    "helm.sh/hook": test-success
+spec:
+  containers:
+    - name: wget
+      image: busybox
+      command: ['wget']
+      args:  ['camunda-operate:80']
+  restartPolicy: Never
